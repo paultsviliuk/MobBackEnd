@@ -15,6 +15,8 @@ urlpatterns= [
     url(r'^getPassword/$',views.getPassword,name='getPassword'),
     #: /account_managment/changePassword,tokken=[токен]/
     url(r'^changePassword,tokken=(?P<tokken>.+)/$',views.changePassword,name='changePassword'),
+    #: /account_managment/changeTelephone,tokken=[токен]/
+    url(r'^changeTelephone,tokken=(?P<tokken>.+)/$', views.changeTelephone, name='changeTelephone'),
     url(r'^checkUserService/$',views.checkUserService,name='checkuserService'),
     url(r'^getAllUserServices,tokken=(?P<tokken>.+)/$',views.getAllUserServices,name='getAllUserServices'),
 

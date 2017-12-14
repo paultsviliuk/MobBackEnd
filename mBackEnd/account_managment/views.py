@@ -140,11 +140,28 @@ def changePassword(request,tokken):
             return HttpResponse("Password has changed")
         except :
             return HttpResponseBadRequest("Illegal tokken")
-
-
-
     else:
         return Http404("Illegal method")
+
+def changeTelephone(request, tokken):
+    if request.method=='POST':
+        request_info = str(request.body, 'utf-8')
+        user_info = json.loads(request_info)
+        try:
+            new_telephone = user_info['telephone']
+        except:
+            return HttpResponseBadRequest("Illegal arguments")
+
+        try:
+            tokken = tokkens.get(user_tokken=tokken)
+            tokken.user.telephone=new_telephone
+            tokken.user.save()
+            return HttpResponse("Telephone has changed")
+        except:
+            return HttpResponseBadRequest("Illegal tokken")
+    else:
+        return Http404("Illegal method")
+
 
 def checkUserService(request):
     if request.method=='POST':
