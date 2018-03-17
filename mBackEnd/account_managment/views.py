@@ -1,5 +1,5 @@
 from django.http import HttpResponse, JsonResponse, HttpResponseBadRequest, Http404
-from .models import User, UserTokken,UserServices
+from .models import User, UserTokken,UserServices,UserActivatedPromoCodes
 from . import mail, generationCodes
 import json
 import datetime
@@ -10,6 +10,7 @@ import requests
 users=User.objects
 tokkens = UserTokken.objects
 user_services=UserServices.objects
+user_acivated_promocodes=UserActivatedPromoCodes.objects
 
 def getUsers(request):
     return HttpResponse(users)
@@ -33,7 +34,6 @@ def addUser(request):
     if request.method=='POST':
         request_info=str(request.body,'utf-8')
         user_info=json.loads(request_info)
-
         try:
             name=user_info['name']
             surname=user_info['surname']
@@ -50,15 +50,30 @@ def addUser(request):
         if users.filter(telephone=telephone).count()!=0:
             return HttpResponseBadRequest("this phone is in use")
 
+        date=datetime.datetime.today()
+
         try:
-            new_user=User(users.all().count()+1,name,surname,email,password,telephone)
-            tokken=generationCodes.makeTokken()
-            new_user.save()
-            new_user_tokken=UserTokken(tokkens.all().count()+1,tokken,new_user.id)
-            new_user_tokken.save()
-            dic={'tokken':tokken}
-            json_response=JsonResponse(dic)
-            return json_response
+            u_count=users.all().count()
+            t_count=tokkens.all().count()
+            if u_count>0:
+                new_user=User(id=users.all()[u_count-1].id+1,name=name,surname=surname,email=email,password=password,telephone=telephone,registration_date=date)
+                tokken=generationCodes.makeTokken()
+                new_user.save()
+                new_user_tokken=UserTokken(tokkens.all()[t_count-1].id+1,tokken,new_user.id)
+                new_user_tokken.save()
+                dic={'tokken':tokken}
+                json_response=JsonResponse(dic)
+                return json_response
+            else:
+                new_user = User(id=0, name=name, surname=surname, email=email, password=password, telephone=telephone,registration_date=date)
+                tokken = generationCodes.makeTokken()
+                new_user.save()
+                new_user_tokken = UserTokken(0, tokken, new_user.id)
+                new_user_tokken.save()
+                dic = {'tokken': tokken}
+                json_response = JsonResponse(dic)
+                return json_response
+
 
         except :
             return HttpResponseBadRequest("Illegal arguments")
@@ -116,7 +131,7 @@ def getPassword(request):
         if telephone!='':
             if users.filter(telephone=telephone).count()!=0:
                 user=users.get(telephone=telephone)
-                mail.sendPassword(email,user.password)
+                mail.sendPassword(user.email,user.password)
                 return HttpResponse("Message has been sent")
             else:
                 return HttpResponseBadRequest("An account with this telephone address does not exist")
@@ -142,6 +157,7 @@ def changePassword(request,tokken):
             return HttpResponseBadRequest("Illegal tokken")
     else:
         return Http404("Illegal method")
+
 
 def changeTelephone(request, tokken):
     if request.method=='POST':
@@ -205,14 +221,15 @@ def getAllUserServices(request,tokken):
 
     all_services=user_services.filter(user=tokken.user)
 
+
     for service in all_services:
         if service.end_time < datetime.datetime.today().date():
             service.delete()
 
     all_services = user_services.filter(user=tokken.user)
     dic = [{'service_name': s.service.service_name, 'id': s.service.id, 'description': s.service.description,
-            'srv_image': s.service.image.url, 'end date': s.end_time}
-           for s in all_services]
+            'srv_image': s.service.image.url, 'end date': s.end_time, 'activated_promocode':promo_code.promo_code, 'duration':promo_code.duration}
+           for s in all_services for promo_code in user_acivated_promocodes.filter(user_service=s)]
 
     return JsonResponse(dic, safe=False)
 
@@ -228,6 +245,8 @@ def GoogleAuthorize(request):
             password = 'Google sign in'
         except:
             return HttpResponseBadRequest('Illegal arguments')
+        date = datetime.datetime.today()
+
 
         if users.filter(email=email).count()!=0:
             user = users.get(email=email)
@@ -236,7 +255,7 @@ def GoogleAuthorize(request):
             json_response = JsonResponse(dic)
             return json_response
         else:
-            new_user = User(users.all().count() + 1, name, surname, email, password)
+            new_user = User(id=users.all().count() + 1, name=name, surname=surname, email=email, password=password,registration_date=date)
             tokken = generationCodes.makeTokken()
             new_user.save()
             new_user_tokken = UserTokken(tokkens.all().count() + 1, tokken, new_user.id)
@@ -258,6 +277,8 @@ def FacebookAuthorize(request):
         except:
             return HttpResponseBadRequest('Illegal arguments')
 
+        date = datetime.datetime.today()
+
         try:
             rw = requests.get("https://graph.facebook.com/me?access_token="+access_token)
             user_info=json.loads(rw.text)
@@ -275,7 +296,7 @@ def FacebookAuthorize(request):
             json_response = JsonResponse(dic)
             return json_response
         else:
-            new_user = User(users.all().count() + 1, name, surname, email, password)
+            new_user = User(id=users.all().count() + 1, name=name, surname=surname, email=email, password=password,registration_date=date)
             tokken = generationCodes.makeTokken()
             new_user.save()
             new_user_tokken = UserTokken(tokkens.all().count() + 1, tokken, new_user.id)
@@ -286,3 +307,4 @@ def FacebookAuthorize(request):
 
     else:
         return Http404("Illegal method")
+

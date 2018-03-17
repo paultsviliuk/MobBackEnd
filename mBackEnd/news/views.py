@@ -1,5 +1,6 @@
 from django.http import HttpResponse, JsonResponse, HttpResponseBadRequest, Http404
 from .models import News
+from django.http import HttpRequest
 
 # Create your views here.
 news=News.objects

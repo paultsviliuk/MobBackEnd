@@ -9,7 +9,6 @@ urlpatterns= [
     url(r'^addUser/$',views.addUser,name='addUser'),
     # : /account_managment/authorizeUser/
     url(r'^authorizeUser/$',views.authorizeUser,name='authorizeUser'),
-    #: /account_managment/getUserInfo,tokken=[токен]/
     url(r'^getUserInfo,tokken=(?P<tokken>.+)/$',views.getUserInfo,name='getUserInfo'),
     #: /account_managment/getPassword/
     url(r'^getPassword/$',views.getPassword,name='getPassword'),

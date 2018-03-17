@@ -3,8 +3,8 @@ import smtplib
 smpt_host='smtp.gmail.com'
 smpt_port=587
 
-login='mobile24.supp@gmail.com'
-password='maSUPPORT2017'
+login='suppmob24@gmail.com'
+password='4kn-dXz-rBZ-5Wf'
 
 send_from="alan@mail.ru"
 password_subject="Password Restore"

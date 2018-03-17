@@ -9,7 +9,7 @@ def TestAddUser(name,surname,email,password,telephone):
         "password" : password,
         "telephone" : telephone
          }
-    r=requests.post("http://127.0.0.1:8000/account_managment/addUser/",json=json.dumps(dic))
+    r=requests.post("http://127.0.0.1:8000/account_managment/addUser/",data=json.dumps(dic))
     print(r.text)
 
 def TestGetUserInfo(tokken):
@@ -22,7 +22,7 @@ def TestAuthorizeUser(email,password,telephone):
         "password": password,
         "telephone": telephone
     }
-    r = requests.post("http://127.0.0.1:8000/account_managment/authorizeUser/",json=json.dumps(dic))
+    r = requests.post("http://127.0.0.1:8000/account_managment/authorizeUser/",data=json.dumps(dic))
     print(r.text)
 
 def TestGetAllUserServices(tokken):
@@ -30,6 +30,20 @@ def TestGetAllUserServices(tokken):
     print(r.text)
 
 
+def TestGetpassword(email="",telephone=""):
+    dic = {
+        "email": email,
+        "telephone": telephone
+    }
+    r=requests.post("http://127.0.0.1:8000/account_managment/getPassword/",data=json.dumps(dic))
+    print(r.text)
+
+
+TestAddUser("Alan","Velonas",email="leshiy12345678@gmail.com",password="11112",telephone="12345")
+TestAuthorizeUser(email="leshiy12345678@gmail.com",password="11112",telephone="")
+TestGetUserInfo("(b'>xaf(>x84>x99n>xc8>x96`>xc2')")
+TestGetAllUserServices("(b'>xaf(>x84>x99n>xc8>x96`>xc2')")
+#TestGetpassword(telephone="12345")
 
 
 TestAddUser("Alan","Velonas","alan2@mail.ru","1111","1234")

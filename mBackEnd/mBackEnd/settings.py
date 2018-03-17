@@ -33,12 +33,17 @@ SECRET_KEY = 'ibpsqr#5ovxqkmg5%y@7=0q9k*t^!ybua_gu7kl8_r@$sa+44a'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['159.89.7.133', '127.0.0.1']
+
+ALLOWED_HOSTS = ['192.168.1.108','79.135.217.216','192.168.1.105','188.115.138.152','127.0.0.1', '46.101.128.178']
+
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    'dal',
+    'dal_select2',
+    'dal_admin_filters',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -47,7 +52,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'account_managment',
     'news',
-    'services'
+    'services',
+    'import_export',
 ]
 
 MIDDLEWARE = [
